@@ -153,8 +153,8 @@ class AcryptoWeightedStrategyOp(IStrategy):
         self.max_open_trades = 10       # 最大同时开仓数量
         self.immediate_entry_slots = 6  # 可立即开启的交易数量
         self.min_time_between_trades = 0.5 # 逐步开仓时的最小时间间隔(小时)
-        self.last_trade_time = datetime.utcnow() - timedelta(hours=24)  # 最后一次开仓时间
-        
+        self.last_trade_time = datetime.now(timezone.utc) - timedelta(hours=24)  # 最后一次开仓时间，带时区
+                
         # Delays
         self.delay_macd = 1
         self.delay_srsi = 2
@@ -1178,11 +1178,10 @@ class AcryptoWeightedStrategyOp(IStrategy):
         open_trades = Trade.get_trades_proxy(is_open=True)
         current_open_trades = len(open_trades)
         
-        # 如果是逐步开仓阶段，更新最后入场时间
-        if current_open_trades >= self.immediate_entry_slots:
-            self.last_trade_time = current_time
-            logger.info(f"全局逐步开仓阶段 - 更新最后开仓时间: {current_time}")
-        
+        # 始终更新最后入场时间
+        self.last_trade_time = current_time
+        logger.info(f"{pair} - 更新最后开仓时间: {current_time}")
+               
         return True
 
     def confirm_trade_exit(self, pair: str, trade: Trade, order_type: str, amount: float,
