@@ -16,57 +16,18 @@ from functools import lru_cache
 import talib.abstract as ta
 from scipy.fft import fft, fftfreq
 from scipy.stats import skew, kurtosis
-# Mock qtpylib for testing - will be replaced in production
+# Production qtpylib import
 try:
     import freqtrade.vendor.qtpylib.indicators as qtpylib
-except ImportError:
-    # Create mock qtpylib for testing
-    class MockQtpylib:
-        @staticmethod
-        def typical_price(df):
-            return (df['high'] + df['low'] + df['close']) / 3
-    qtpylib = MockQtpylib()
-# Mock FreqTrade for testing - will be replaced in production
+except ImportError as e:
+    raise ImportError("Could not import freqtrade.vendor.qtpylib.indicators. This module is required for production. For testing, use mocks from the test_mocks module.") from e
+
+# Production FreqTrade imports
 try:
     from freqtrade.strategy import IStrategy, DecimalParameter, IntParameter, BooleanParameter
     from freqtrade.persistence import Trade
-except ImportError:
-    # Create mock FreqTrade classes for testing
-    class IStrategy:
-        INTERFACE_VERSION = 3
-        timeframe = '5m'
-        can_short = False
-        stoploss = -0.10
-        startup_candle_count = 200
-        minimal_roi = {"0": 0.15}
-        trailing_stop = True
-        
-        def __init__(self, config):
-            self.config = config
-        
-        def informative_pairs(self):
-            return []
-    
-    class DecimalParameter:
-        def __init__(self, low, high, default, optimize=True, space='buy'):
-            self.value = default
-    
-    class IntParameter:
-        def __init__(self, low, high, default, optimize=True, space='buy'):
-            self.value = default
-    
-    class BooleanParameter:
-        def __init__(self, default, optimize=True, space='buy'):
-            self.value = default
-    
-    class Trade:
-        def __init__(self, open_rate=100.0, open_date=None):
-            self.open_rate = open_rate
-            self.open_date_utc = open_date or datetime.now()
-        
-        def calc_profit_ratio(self, rate):
-            return (rate - self.open_rate) / self.open_rate
-
+except ImportError as e:
+    raise ImportError("Could not import FreqTrade strategy classes. These are required for production. For testing, use mocks from the test_mocks module.") from e
 # Suppress warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", message=".*pkg_resources.*")
