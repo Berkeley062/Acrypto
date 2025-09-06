@@ -1,0 +1,169 @@
+{
+    "trading_mode": "spot",
+    "margin_mode": "",
+    "max_open_trades": 3,
+    "stake_currency": "USDT",
+    "stake_amount": "unlimited",
+    "tradable_balance_ratio": 0.99,
+    "fiat_display_currency": "USD",
+    "dry_run": true,
+    "dry_run_wallet": 10000,
+    "cancel_open_orders_on_exit": false,
+    
+    "timeframe": "5m",
+    "startup_candle_count": 200,
+    
+    "strategy": "AlexNexusForgeML",
+    "strategy_parameters": {
+        "_comment": "ML Confidence Thresholds",
+        "ml_entry_threshold_high": 0.85,
+        "ml_entry_threshold_medium": 0.75,
+        "ml_confidence_threshold": 0.70,
+        "ml_agreement_threshold": 0.75,
+        
+        "_comment": "Traditional Indicator Support",
+        "rsi_support_enabled": true,
+        "volume_support_enabled": true,
+        "trend_support_enabled": true,
+        
+        "_comment": "Risk Management",
+        "max_open_trades": 3,
+        "risk_per_trade": 0.02,
+        
+        "_comment": "ML Training Control",
+        "retrain_interval_hours": 12,
+        "min_training_samples": 200
+    },
+    
+    "entry_pricing": {
+        "price_side": "same",
+        "use_order_book": true,
+        "order_book_top": 1,
+        "price_last_balance": 0.0,
+        "check_depth_of_market": {
+            "enabled": false,
+            "bids_to_ask_delta": 1
+        }
+    },
+    
+    "exit_pricing": {
+        "price_side": "same",
+        "use_order_book": true,
+        "order_book_top": 1
+    },
+    
+    "exchange": {
+        "name": "binance",
+        "key": "",
+        "secret": "",
+        "ccxt_config": {},
+        "ccxt_async_config": {},
+        "pair_whitelist": [
+            "BTC/USDT",
+            "ETH/USDT", 
+            "BNB/USDT",
+            "ADA/USDT",
+            "DOT/USDT",
+            "SOL/USDT",
+            "MATIC/USDT",
+            "AVAX/USDT",
+            "LINK/USDT",
+            "UNI/USDT"
+        ],
+        "pair_blacklist": [
+            ".*_BEAR/.*",
+            ".*_BULL/.*"
+        ]
+    },
+    
+    "dataformat_ohlcv": "json",
+    "dataformat_trades": "jsongz",
+    
+    "bot_name": "AlexNexusForgeML",
+    "initial_state": "running",
+    "force_entry_enable": false,
+    "internals": {
+        "process_throttle_secs": 5
+    },
+    
+    "telegram": {
+        "enabled": false,
+        "token": "",
+        "chat_id": "",
+        "notification_settings": {
+            "status": "silent",
+            "warning": "on",
+            "startup": "on",
+            "entry": "on",
+            "entry_fill": "silent",
+            "exit": "on",
+            "exit_fill": "on",
+            "exit_cancel": "on",
+            "protection_trigger": "on",
+            "protection_trigger_global": "on"
+        }
+    },
+    
+    "api_server": {
+        "enabled": true,
+        "listen_ip_address": "0.0.0.0",
+        "listen_port": 8080,
+        "verbosity": "error",
+        "enable_openapi": false,
+        "jwt_secret_key": "your-secret-key-here",
+        "ws_token": "your-ws-token-here",
+        "CORS_origins": ["http://localhost:3000"],
+        "username": "freqtrade",
+        "password": "your-password-here"
+    },
+    
+    "db_url": "sqlite:///tradesv3.sqlite",
+    "user_data_dir": "user_data",
+    
+    "logfile": "logs/freqtrade_ml.log",
+    "log_level": "info",
+    
+    "_comment_optimization": "Optimization settings for hyperopt",
+    "hyperopt": {
+        "hyperopt_jobs": 4,
+        "hyperopt_random_state": 42,
+        "hyperopt_min_trades": 1,
+        "hyperopt_loss": "SharpeHyperOptLoss"
+    },
+    
+    "_comment_backtesting": "Backtesting specific settings",
+    "backtesting": {
+        "enable_protections": false,
+        "startup_candle_count": 200,
+        "timerange": "20230101-20240101"
+    },
+    
+    "_comment_ml_specific": "AlexNexusForgeML specific configurations",
+    "ml_config": {
+        "models_directory": "user_data/strategies/ml_models",
+        "feature_importance_logging": true,
+        "prediction_history_size": 100,
+        "model_performance_tracking": true,
+        "bilingual_logging": true,
+        "log_ml_decisions": true,
+        "log_feature_importance": false,
+        "save_predictions": true
+    },
+    
+    "_comment_risk": "Risk management settings",
+    "risk_management": {
+        "max_drawdown": 0.15,
+        "max_daily_loss": 0.05,
+        "position_size_limit": 0.10,
+        "emergency_exit_enabled": true,
+        "volatility_protection": true
+    },
+    
+    "_comment_performance": "Performance optimization",
+    "performance": {
+        "cache_ml_predictions": true,
+        "parallel_model_training": true,
+        "feature_caching": true,
+        "async_indicator_calculation": false
+    }
+}
