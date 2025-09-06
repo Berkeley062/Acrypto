@@ -173,7 +173,8 @@ class MLPredictiveEngine:
             df['macd'] = macd
             df['macd_signal'] = macdsignal
             df['macd_histogram'] = macdhist
-            df['macd_slope'] = macd.diff(3)
+            # Use pandas Series diff() instead of numpy array diff()
+            df['macd_slope'] = df['macd'].diff(3)
             
             # Bollinger Bands
             bb_upper, bb_middle, bb_lower = ta.BBANDS(df['close'])
@@ -265,15 +266,48 @@ class MLPredictiveEngine:
             return df
     
     def _calculate_entropy(self, series: pd.Series, window: int) -> pd.Series:
-        """Calculate rolling entropy"""
+        """Calculate rolling entropy using numpy diff function"""
         def entropy(data):
-            if len(data) < 5:
+            try:
+                # Ensure we have enough data points
+                if len(data) < 5:
+                    return 0
+                
+                # Convert to numpy array to ensure consistent behavior
+                # This prevents "numpy.ndarray object has no attribute 'diff'" errors
+                data_array = np.asarray(data)
+                
+                # Check for invalid data (NaN, inf, etc.)
+                if np.any(~np.isfinite(data_array)):
+                    return 0
+                
+                # Use np.diff() instead of calling diff() on numpy arrays
+                returns = np.diff(data_array) / (data_array[:-1] + 1e-10)
+                
+                # Handle edge cases where returns might be invalid
+                if len(returns) == 0 or np.any(~np.isfinite(returns)):
+                    return 0
+                
+                # Calculate histogram
+                hist, _ = np.histogram(returns, bins=10)
+                
+                # Calculate probabilities
+                total_count = hist.sum()
+                if total_count == 0:
+                    return 0
+                
+                probs = hist / (total_count + 1e-10)
+                probs = probs[probs > 0]
+                
+                # Calculate entropy
+                if len(probs) == 0:
+                    return 0
+                
+                return -np.sum(probs * np.log2(probs + 1e-10))
+                
+            except Exception:
+                # Return 0 for any calculation errors to maintain stability
                 return 0
-            returns = np.diff(data) / (data[:-1] + 1e-10)
-            hist, _ = np.histogram(returns, bins=10)
-            probs = hist / (hist.sum() + 1e-10)
-            probs = probs[probs > 0]
-            return -np.sum(probs * np.log2(probs + 1e-10))
         
         return series.rolling(window).apply(entropy, raw=False)
     
